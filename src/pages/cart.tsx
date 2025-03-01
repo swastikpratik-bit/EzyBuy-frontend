@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { VscError } from "react-icons/vsc";
 
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import CartItemCard from "../components/cart-items";
@@ -10,10 +11,9 @@ import {
   discountApplied,
   removeCartItem,
 } from "../redux/reducer/cartReducer";
+import { server } from "../redux/store";
 import { cartReducerInitialState } from "../types/reducer-types";
 import { CartItem } from "../types/types";
-import axios from "axios";
-import { server } from "../redux/store";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    const { token: cancelToken, cancel } = axios.CancelToken.source();
+    const { token: cancelToken } = axios.CancelToken.source();
     const timeOutId = setTimeout(() => {
       axios
         .get(`${server}/api/v1/payment/discount?coupon=${couponCode}`, {
