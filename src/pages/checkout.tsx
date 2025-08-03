@@ -12,10 +12,13 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useNewOrderMutation } from "../redux/api/orderAPI";
 import { resetCart } from "../redux/reducer/cartReducer";
 import { RootState } from "../redux/store";
-import { newOrderRequest } from "../types/api-types";
+import { NewOrderRequest } from "../types/api-types";
 import { responseToast } from "../utils/features";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
+const stripeKey =
+  "pk_test_51OHpE1SEOz14slwcBOcGOweicHk9XITWgND9NAvr7ZJXIYdUiNyOHQtrbCsdQTLQqVAgDNeaDpPshuIO1PnHthtq00AJdf3gtG";
+
+const stripePromise = loadStripe(stripeKey);
 
 const CheckOutForm = () => {
   const stripe = useStripe();
@@ -26,35 +29,32 @@ const CheckOutForm = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
 
   const {
-    shippingCharges,
+    shippingInfo,
     cartItems,
     subtotal,
     tax,
     discount,
-    shippingInfo,
+    shippingCharges,
     total,
   } = useSelector((state: RootState) => state.cartReducer);
 
-  const [isProccessing, setIsProccessing] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const [newOrder] = useNewOrderMutation();
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
-      return;
-    }
+    if (!stripe || !elements) return;
+    setIsProcessing(true);
 
-    setIsProccessing(true);
-
-    const orderData: newOrderRequest = {
-      shippingCharges,
+    const orderData: NewOrderRequest = {
+      shippingInfo,
       orderItems: cartItems,
-      subTotal: subtotal,
+      subtotal,
       tax,
       discount,
-      shippingInfo,
+      shippingCharges,
       total,
       user: user?._id!,
     };
@@ -66,23 +66,23 @@ const CheckOutForm = () => {
     });
 
     if (error) {
-      setIsProccessing(false);
+      setIsProcessing(false);
       return toast.error(error.message || "Something Went Wrong");
     }
+
     if (paymentIntent.status === "succeeded") {
       const res = await newOrder(orderData);
       dispatch(resetCart());
       responseToast(res, navigate, "/orders");
     }
-    setIsProccessing(false);
+    setIsProcessing(false);
   };
-
   return (
     <div className="checkout-container">
       <form onSubmit={submitHandler}>
         <PaymentElement />
-        <button type="submit" disabled={isProccessing}>
-          {isProccessing ? "Processing..." : "Pay"}{" "}
+        <button type="submit" disabled={isProcessing}>
+          {isProcessing ? "Processing..." : "Pay"}
         </button>
       </form>
     </div>
@@ -94,9 +94,8 @@ const Checkout = () => {
 
   const clientSecret: string | undefined = location.state;
 
-  if (!clientSecret) {
-    return <Navigate to={"/shipping"} />;
-  }
+  if (!clientSecret) return <Navigate to={"/shipping"} />;
+
   return (
     <Elements
       options={{

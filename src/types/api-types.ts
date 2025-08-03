@@ -1,10 +1,12 @@
 import {
   Bar,
   CartItem,
+  CouponType,
   Line,
   Order,
   Pie,
   Product,
+  Review,
   ShippingInfo,
   Stats,
   User,
@@ -17,31 +19,62 @@ export type CustomError = {
     success: boolean;
   };
 };
+
 export type MessageResponse = {
-  success: Boolean;
+  success: boolean;
   message: string;
 };
-export type allUserResponse = {
-  success: Boolean;
+
+export type AllUsersResponse = {
+  success: boolean;
   users: User[];
 };
+
 export type UserResponse = {
-  success: Boolean;
+  success: boolean;
   user: User;
 };
 
 export type AllProductsResponse = {
-  success: Boolean;
+  success: boolean;
   products: Product[];
+};
+export type AllReviewsResponse = {
+  success: boolean;
+  reviews: Review[];
+};
+export type CategoriesResponse = {
+  success: boolean;
+  categories: string[];
+};
+
+export type SearchProductsResponse = AllProductsResponse & {
+  totalPage: number;
+};
+export type SearchProductsRequest = {
+  price: number;
+  page: number;
+  category: string;
+  search: string;
+  sort: string;
 };
 export type ProductResponse = {
-  success: Boolean;
+  success: boolean;
   product: Product;
 };
-export type searchProductsResponse = {
-  success: Boolean;
-  products: Product[];
-  totalPage: number;
+
+export type AllOrdersResponse = {
+  success: boolean;
+  orders: Order[];
+};
+export type OrderDetailsResponse = {
+  success: boolean;
+  order: Order;
+};
+
+export type StatsResponse = {
+  success: boolean;
+  stats: Stats;
 };
 
 export type PieResponse = {
@@ -59,57 +92,37 @@ export type LineResponse = {
   charts: Line;
 };
 
-export type StatsResponse = {
-  success: boolean;
-  stats: Stats;
+export type NewReviewRequest = {
+  rating: number;
+  comment: string;
+  userId?: string;
+  productId: string;
 };
 
-export type searchProductsRequest = {
-  price: number;
-  page: number;
-  category: string;
-  search: string;
-  sort: string;
-};
-
-export type CategoriesResponse = {
-  success: Boolean;
-  categories: string[];
-};
-
-export type AllOrderResponse = {
-  success: boolean;
-  orders: Order[];
-};
-
-export type orderDetailsResponse = {
-  success: boolean;
-  order: Order;
-};
-
-export type statsResponse = {
-  success: boolean;
-  stats: Stats;
+export type DeleteReviewRequest = {
+  userId?: string;
+  reviewId: string;
 };
 
 export type NewProductRequest = {
   id: string;
   formData: FormData;
 };
-export type updateProductRequest = {
+
+export type UpdateProductRequest = {
   userId: string;
   productId: string;
   formData: FormData;
 };
-export type deleteProductRequest = {
+export type DeleteProductRequest = {
   userId: string;
   productId: string;
 };
 
-export type newOrderRequest = {
+export type NewOrderRequest = {
   shippingInfo: ShippingInfo;
   orderItems: CartItem[];
-  subTotal: number;
+  subtotal: number;
   tax: number;
   shippingCharges: number;
   discount: number;
@@ -117,12 +130,22 @@ export type newOrderRequest = {
   user: string;
 };
 
-export type updateOrderRequest = {
-  userId: String;
-  orderId: String;
+export type UpdateOrderRequest = {
+  userId: string;
+  orderId: string;
 };
 
-export type deleteUserRequest = {
-  userId: String;
-  adminUserId: String;
+export type DeleteUserRequest = {
+  userId: string;
+  adminUserId: string;
+};
+
+export type AllDiscountResponse = {
+  success: boolean;
+  coupons: CouponType[];
+};
+
+export type SingleDiscountResponse = {
+  success: boolean;
+  coupon: CouponType;
 };

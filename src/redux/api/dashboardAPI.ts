@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
-  PieResponse,
-  statsResponse,
   BarResponse,
   LineResponse,
+  PieResponse,
+  StatsResponse,
 } from "../../types/api-types";
 
 export const dashboardApi = createApi({
@@ -11,9 +11,8 @@ export const dashboardApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_SERVER}/api/v1/dashboard/`,
   }),
-  tagTypes: ["orders"],
   endpoints: (builder) => ({
-    stats: builder.query<statsResponse, string>({
+    stats: builder.query<StatsResponse, string>({
       query: (id) => `stats?id=${id}`,
       keepUnusedDataFor: 0,
     }),
@@ -32,5 +31,5 @@ export const dashboardApi = createApi({
   }),
 });
 
-export const { useBarQuery, usePieQuery, useLineQuery, useStatsQuery } =
+export const { useBarQuery, useStatsQuery, useLineQuery, usePieQuery } =
   dashboardApi;

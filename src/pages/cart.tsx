@@ -1,53 +1,51 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { VscError } from "react-icons/vsc";
-
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import CartItemCard from "../components/cart-items";
+import CartItemCard from "../components/cart-item";
 import {
   addToCart,
   calculatePrice,
   discountApplied,
   removeCartItem,
+  saveCoupon,
 } from "../redux/reducer/cartReducer";
-import { server } from "../redux/store";
-import { cartReducerInitialState } from "../types/reducer-types";
+import { RootState, server } from "../redux/store";
 import { CartItem } from "../types/types";
 
 const Cart = () => {
-  const dispatch = useDispatch();
-
   const { cartItems, subtotal, tax, total, shippingCharges, discount } =
-    useSelector(
-      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
-    );
+    useSelector((state: RootState) => state.cartReducer);
+  const dispatch = useDispatch();
 
   const [couponCode, setCouponCode] = useState<string>("");
   const [isValidCouponCode, setIsValidCouponCode] = useState<boolean>(false);
 
   const incrementHandler = (cartItem: CartItem) => {
     if (cartItem.quantity >= cartItem.stock) return;
+
     dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity + 1 }));
   };
   const decrementHandler = (cartItem: CartItem) => {
     if (cartItem.quantity <= 1) return;
+
     dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity - 1 }));
   };
-
   const removeHandler = (productId: string) => {
     dispatch(removeCartItem(productId));
   };
-
   useEffect(() => {
-    const { token: cancelToken } = axios.CancelToken.source();
-    const timeOutId = setTimeout(() => {
+    const { token: cancelToken, cancel } = axios.CancelToken.source();
+
+    const timeOutID = setTimeout(() => {
       axios
         .get(`${server}/api/v1/payment/discount?coupon=${couponCode}`, {
           cancelToken,
         })
         .then((res) => {
           dispatch(discountApplied(res.data.discount));
+          dispatch(saveCoupon(couponCode));
           setIsValidCouponCode(true);
           dispatch(calculatePrice());
         })
@@ -59,7 +57,8 @@ const Cart = () => {
     }, 1000);
 
     return () => {
-      clearTimeout(timeOutId);
+      clearTimeout(timeOutID);
+      cancel();
       setIsValidCouponCode(false);
     };
   }, [couponCode]);
@@ -74,11 +73,11 @@ const Cart = () => {
         {cartItems.length > 0 ? (
           cartItems.map((i, idx) => (
             <CartItemCard
-              key={idx}
-              cartItem={i}
               incrementHandler={incrementHandler}
               decrementHandler={decrementHandler}
               removeHandler={removeHandler}
+              key={idx}
+              cartItem={i}
             />
           ))
         ) : (
@@ -86,12 +85,11 @@ const Cart = () => {
         )}
       </main>
       <aside>
-        <p>SubTotal : ₹{subtotal}</p>
-        <p>Shipping Charges : ₹{shippingCharges}</p>
-        <p>Tax : {tax}</p>
+        <p>Subtotal: ₹{subtotal}</p>
+        <p>Shipping Charges: ₹{shippingCharges}</p>
+        <p>Tax: ₹{tax}</p>
         <p>
-          {" "}
-          Discount : <em className="red">- ₹{discount}</em>
+          Discount: <em className="red"> - ₹{discount}</em>
         </p>
         <p>
           <b>Total: ₹{total}</b>
@@ -99,6 +97,7 @@ const Cart = () => {
 
         <input
           type="text"
+          placeholder="Coupon Code"
           value={couponCode}
           onChange={(e) => setCouponCode(e.target.value)}
         />
@@ -114,7 +113,7 @@ const Cart = () => {
             </span>
           ))}
 
-        {cartItems.length > 0 && <Link to={"/shipping"}>Checkout</Link>}
+        {cartItems.length > 0 && <Link to="/shipping">Checkout</Link>}
       </aside>
     </div>
   );

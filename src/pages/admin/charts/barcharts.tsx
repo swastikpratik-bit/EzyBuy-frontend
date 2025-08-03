@@ -2,13 +2,13 @@ import { useSelector } from "react-redux";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { BarChart } from "../../../components/admin/Charts";
 import { RootState } from "../../../redux/store";
-import { CustomError } from "../../../types/api-types";
 import { useBarQuery } from "../../../redux/api/dashboardAPI";
+import { CustomError } from "../../../types/api-types";
 import toast from "react-hot-toast";
 import { Skeleton } from "../../../components/loader";
 import { getLastMonths } from "../../../utils/features";
 
-const { last6Months, last12Months } = getLastMonths();
+const { last12Months, last6Months } = getLastMonths();
 
 const Barcharts = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
@@ -23,6 +23,7 @@ const Barcharts = () => {
     const err = error as CustomError;
     toast.error(err.data.message);
   }
+
   return (
     <div className="admin-container">
       <AdminSidebar />
@@ -34,8 +35,8 @@ const Barcharts = () => {
           <>
             <section>
               <BarChart
-                data_2={products}
-                data_1={users}
+                data_1={products}
+                data_2={users}
                 labels={last6Months}
                 title_1="Products"
                 title_2="Users"
@@ -50,11 +51,11 @@ const Barcharts = () => {
                 horizontal={true}
                 data_1={orders}
                 data_2={[]}
-                labels={last12Months}
                 title_1="Orders"
                 title_2=""
                 bgColor_1={`hsl(180, 40%, 50%)`}
                 bgColor_2=""
+                labels={last12Months}
               />
               <h2>Orders throughout the year</h2>
             </section>

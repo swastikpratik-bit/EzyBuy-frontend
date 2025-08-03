@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { cartReducerInitialState } from "../../types/reducer-types";
+import { CartReducerInitialState } from "../../types/reducer-types";
 import { CartItem, ShippingInfo } from "../../types/types";
 
-const initialState: cartReducerInitialState = {
+const initialState: CartReducerInitialState = {
   loading: false,
   cartItems: [],
   subtotal: 0,
@@ -10,6 +10,7 @@ const initialState: cartReducerInitialState = {
   shippingCharges: 0,
   discount: 0,
   total: 0,
+  coupon: undefined,
   shippingInfo: {
     address: "",
     city: "",
@@ -19,7 +20,7 @@ const initialState: cartReducerInitialState = {
   },
 };
 
-export const carteRedcuer = createSlice({
+export const cartReducer = createSlice({
   name: "cartReducer",
   initialState,
   reducers: {
@@ -30,13 +31,11 @@ export const carteRedcuer = createSlice({
         (i) => i.productId === action.payload.productId
       );
 
-      if (index !== -1) {
-        state.cartItems[index] = action.payload;
-      } else {
-        state.cartItems.push(action.payload);
-      }
+      if (index !== -1) state.cartItems[index] = action.payload;
+      else state.cartItems.push(action.payload);
       state.loading = false;
     },
+
     removeCartItem: (state, action: PayloadAction<string>) => {
       state.loading = true;
       state.cartItems = state.cartItems.filter(
@@ -44,14 +43,15 @@ export const carteRedcuer = createSlice({
       );
       state.loading = false;
     },
+
     calculatePrice: (state) => {
-      let subtotal = state.cartItems.reduce(
-        (tot, item) => tot + item.price * item.quantity,
+      const subtotal = state.cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
         0
       );
 
       state.subtotal = subtotal;
-      state.shippingCharges = state.subtotal > 1000 ? 0 : 40;
+      state.shippingCharges = state.subtotal > 1000 ? 0 : 200;
       state.tax = Math.round(state.subtotal * 0.18);
       state.total =
         state.subtotal + state.tax + state.shippingCharges - state.discount;
@@ -59,6 +59,10 @@ export const carteRedcuer = createSlice({
 
     discountApplied: (state, action: PayloadAction<number>) => {
       state.discount = action.payload;
+    },
+
+    saveCoupon: (state, action: PayloadAction<string>) => {
+      state.coupon = action.payload;
     },
     saveShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
       state.shippingInfo = action.payload;
@@ -74,4 +78,5 @@ export const {
   discountApplied,
   saveShippingInfo,
   resetCart,
-} = carteRedcuer.actions;
+  saveCoupon,
+} = cartReducer.actions;

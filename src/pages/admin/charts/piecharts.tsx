@@ -18,9 +18,7 @@ const PieCharts = () => {
   const ageGroup = data?.charts.usersAgeGroup!;
   const adminCustomer = data?.charts.adminCustomer!;
 
-  if (isError) {
-    return <Navigate to="/admin/dashboard" />;
-  }
+  if (isError) return <Navigate to={"/admin/dashboard"} />;
 
   return (
     <div className="admin-container">
@@ -29,7 +27,7 @@ const PieCharts = () => {
         <h1>Pie & Doughnut Charts</h1>
 
         {isLoading ? (
-          <Skeleton length={18} />
+          <Skeleton length={20} />
         ) : (
           <>
             <section>
@@ -55,7 +53,7 @@ const PieCharts = () => {
                   data={categories.map((i) => Object.values(i)[0])}
                   backgroundColor={categories.map(
                     (i) =>
-                      `hsl(${Object.values(i)[0] * Math.random() * 4}, ${
+                      `hsl(${Object.values(i)[0] * 4}, ${
                         Object.values(i)[0]
                       }%, 50%)`
                   )}

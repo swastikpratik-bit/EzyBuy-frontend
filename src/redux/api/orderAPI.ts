@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
-  AllOrderResponse,
+  AllOrdersResponse,
   MessageResponse,
-  newOrderRequest,
-  orderDetailsResponse,
-  updateOrderRequest,
+  NewOrderRequest,
+  OrderDetailsResponse,
+  UpdateOrderRequest,
 } from "../../types/api-types";
 
 export const orderApi = createApi({
@@ -14,7 +14,7 @@ export const orderApi = createApi({
   }),
   tagTypes: ["orders"],
   endpoints: (builder) => ({
-    newOrder: builder.mutation<MessageResponse, newOrderRequest>({
+    newOrder: builder.mutation<MessageResponse, NewOrderRequest>({
       query: (order) => ({
         url: "new",
         method: "POST",
@@ -22,40 +22,40 @@ export const orderApi = createApi({
       }),
       invalidatesTags: ["orders"],
     }),
-    myOrders: builder.query<AllOrderResponse, string>({
-      query: (id) => `my?id=${id}`,
-      providesTags: ["orders"],
-    }),
-    AllOrders: builder.query<AllOrderResponse, string>({
-      query: (id) => `all?id=${id}`,
-      providesTags: ["orders"],
-    }),
-    orderDetails: builder.query<orderDetailsResponse, string>({
-      query: (id) => id,
-      providesTags: ["orders"],
-    }),
-    updateOrder: builder.mutation<MessageResponse, updateOrderRequest>({
+    updateOrder: builder.mutation<MessageResponse, UpdateOrderRequest>({
       query: ({ userId, orderId }) => ({
         url: `${orderId}?id=${userId}`,
         method: "PUT",
       }),
       invalidatesTags: ["orders"],
     }),
-    deleteOrder: builder.mutation<MessageResponse, updateOrderRequest>({
+    deleteOrder: builder.mutation<MessageResponse, UpdateOrderRequest>({
       query: ({ userId, orderId }) => ({
         url: `${orderId}?id=${userId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["orders"],
     }),
+    myOrders: builder.query<AllOrdersResponse, string>({
+      query: (id) => `my?id=${id}`,
+      providesTags: ["orders"],
+    }),
+    allOrders: builder.query<AllOrdersResponse, string>({
+      query: (id) => `all?id=${id}`,
+      providesTags: ["orders"],
+    }),
+    orderDetails: builder.query<OrderDetailsResponse, string>({
+      query: (id) => id,
+      providesTags: ["orders"],
+    }),
   }),
 });
 
 export const {
   useNewOrderMutation,
+  useUpdateOrderMutation,
+  useDeleteOrderMutation,
   useMyOrdersQuery,
   useAllOrdersQuery,
   useOrderDetailsQuery,
-  useUpdateOrderMutation,
-  useDeleteOrderMutation,
 } = orderApi;

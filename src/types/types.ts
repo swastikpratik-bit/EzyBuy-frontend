@@ -11,11 +11,30 @@ export type User = {
 export type Product = {
   name: string;
   price: number;
-  photo: string;
   stock: number;
   category: string;
+  ratings: number;
+  numOfReviews: number;
+  description: string;
+  photos: {
+    url: string;
+    public_id: string;
+  }[];
   _id: string;
 };
+
+export type Review = {
+  rating: number;
+  comment: string;
+  product: string;
+  user: {
+    name: string;
+    photo: string;
+    _id: string;
+  };
+  _id: string;
+};
+
 export type ShippingInfo = {
   address: string;
   city: string;
@@ -32,7 +51,6 @@ export type CartItem = {
   quantity: number;
   stock: number;
 };
-
 export type OrderItem = Omit<CartItem, "stock"> & { _id: string };
 
 export type Order = {
@@ -51,25 +69,25 @@ export type Order = {
   _id: string;
 };
 
-export type percentChangeType = {
+type CountAndChange = {
   revenue: number;
+  product: number;
   user: number;
   order: number;
-  product: number;
 };
 
-type LatestTransactionType = {
+type LatestTransaction = {
   _id: string;
-  discount: number;
   amount: number;
+  discount: number;
   quantity: number;
   status: string;
 };
 
 export type Stats = {
   categoryCount: Record<string, number>[];
-  changePercentage: percentChangeType;
-  counts: percentChangeType;
+  changePercent: CountAndChange;
+  count: CountAndChange;
   chart: {
     order: number[];
     revenue: number[];
@@ -78,8 +96,7 @@ export type Stats = {
     male: number;
     female: number;
   };
-
-  latestTransaction: LatestTransactionType[];
+  latestTransaction: LatestTransaction[];
 };
 
 type OrderFullfillment = {
@@ -127,4 +144,10 @@ export type Line = {
   products: number[];
   discount: number[];
   revenue: number[];
+};
+
+export type CouponType = {
+  code: string;
+  amount: number;
+  _id: string;
 };

@@ -1,11 +1,5 @@
 const OrderDetails = () => {
-  return (
-    <div className="container">
-      order Details
-      <br />
-      To Do
-    </div>
-  );
+  return <div>OrderDetails</div>;
 };
 
 export default OrderDetails;

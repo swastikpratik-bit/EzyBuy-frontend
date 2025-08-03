@@ -1,13 +1,12 @@
 import { ReactElement, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { Column } from "react-table";
 import TableHOC from "../components/admin/TableHOC";
 import { Skeleton } from "../components/loader";
 import { useMyOrdersQuery } from "../redux/api/orderAPI";
+import { RootState } from "../redux/store";
 import { CustomError } from "../types/api-types";
-import { userReducerInitialState } from "../types/reducer-types";
 
 type DataType = {
   _id: string;
@@ -15,7 +14,6 @@ type DataType = {
   quantity: number;
   discount: number;
   status: ReactElement;
-  action: ReactElement;
 };
 
 const column: Column<DataType>[] = [
@@ -39,21 +37,18 @@ const column: Column<DataType>[] = [
     Header: "Status",
     accessor: "status",
   },
-  {
-    Header: "Action",
-    accessor: "action",
-  },
 ];
 
 const Orders = () => {
-  const { user } = useSelector(
-    (state: { userReducer: userReducerInitialState }) => state.userReducer
-  );
+  const { user } = useSelector((state: RootState) => state.userReducer);
 
   const { isLoading, data, isError, error } = useMyOrdersQuery(user?._id!);
 
+  const [rows, setRows] = useState<DataType[]>([]);
+
   if (isError) {
-    toast.error((error as CustomError).data.message);
+    const err = error as CustomError;
+    toast.error(err.data.message);
   }
 
   useEffect(() => {
@@ -77,12 +72,9 @@ const Orders = () => {
               {i.status}
             </span>
           ),
-          action: <Link to={`/admin/transaction/${i._id}`}>Manage</Link>,
         }))
       );
   }, [data]);
-
-  const [rows, setRows] = useState<DataType[]>([]);
 
   const Table = TableHOC<DataType>(
     column,
@@ -91,11 +83,9 @@ const Orders = () => {
     "Orders",
     rows.length > 6
   )();
-
   return (
     <div className="container">
       <h1>My Orders</h1>
-
       {isLoading ? <Skeleton length={20} /> : Table}
     </div>
   );

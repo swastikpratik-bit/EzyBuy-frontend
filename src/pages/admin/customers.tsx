@@ -52,8 +52,11 @@ const columns: Column<DataType>[] = [
 
 const Customers = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);
+
   const { isLoading, data, isError, error } = useAllUsersQuery(user?._id!);
+
   const [rows, setRows] = useState<DataType[]>([]);
+
   const [deleteUser] = useDeleteUserMutation();
 
   const deleteHandler = async (userId: string) => {
@@ -67,7 +70,7 @@ const Customers = () => {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data)
       setRows(
         data.users.map((i) => ({
           avatar: (
@@ -90,7 +93,6 @@ const Customers = () => {
           ),
         }))
       );
-    }
   }, [data]);
 
   const Table = TableHOC<DataType>(

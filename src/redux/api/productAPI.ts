@@ -1,14 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
   AllProductsResponse,
+  AllReviewsResponse,
   CategoriesResponse,
-  deleteProductRequest,
+  DeleteProductRequest,
+  DeleteReviewRequest,
   MessageResponse,
   NewProductRequest,
+  NewReviewRequest,
   ProductResponse,
-  searchProductsRequest,
-  searchProductsResponse,
-  updateProductRequest,
+  SearchProductsRequest,
+  SearchProductsResponse,
+  UpdateProductRequest,
 } from "../../types/api-types";
 
 export const productAPI = createApi({
@@ -23,16 +26,17 @@ export const productAPI = createApi({
       providesTags: ["product"],
     }),
     allProducts: builder.query<AllProductsResponse, string>({
-      query: (id) => `adminproducts?id=${id}`,
+      query: (id) => `admin-products?id=${id}`,
       providesTags: ["product"],
     }),
     categories: builder.query<CategoriesResponse, string>({
-      query: () => `category`,
+      query: () => `categories`,
       providesTags: ["product"],
     }),
+
     searchProducts: builder.query<
-      searchProductsResponse,
-      searchProductsRequest
+      SearchProductsResponse,
+      SearchProductsRequest
     >({
       query: ({ price, search, sort, category, page }) => {
         let base = `all?search=${search}&page=${page}`;
@@ -45,12 +49,38 @@ export const productAPI = createApi({
       },
       providesTags: ["product"],
     }),
+
     productDetails: builder.query<ProductResponse, string>({
       query: (id) => id,
       providesTags: ["product"],
     }),
 
-    createProduct: builder.mutation<MessageResponse, NewProductRequest>({
+    allReviewsOfProducts: builder.query<AllReviewsResponse, string>({
+      query: (productId) => `reviews/${productId}`,
+      providesTags: ["product"],
+    }),
+
+    newReview: builder.mutation<MessageResponse, NewReviewRequest>({
+      query: ({ comment, rating, productId, userId }) => ({
+        url: `review/new/${productId}?id=${userId}`,
+        method: "POST",
+        body: { comment, rating },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+      invalidatesTags: ["product"],
+    }),
+
+    deleteReview: builder.mutation<MessageResponse, DeleteReviewRequest>({
+      query: ({ reviewId, userId }) => ({
+        url: `/review/${reviewId}?id=${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["product"],
+    }),
+
+    newProduct: builder.mutation<MessageResponse, NewProductRequest>({
       query: ({ formData, id }) => ({
         url: `new?id=${id}`,
         method: "POST",
@@ -58,7 +88,8 @@ export const productAPI = createApi({
       }),
       invalidatesTags: ["product"],
     }),
-    updateProduct: builder.mutation<MessageResponse, updateProductRequest>({
+
+    updateProduct: builder.mutation<MessageResponse, UpdateProductRequest>({
       query: ({ formData, userId, productId }) => ({
         url: `${productId}?id=${userId}`,
         method: "PUT",
@@ -67,7 +98,7 @@ export const productAPI = createApi({
       invalidatesTags: ["product"],
     }),
 
-    deleteProduct: builder.mutation<MessageResponse, deleteProductRequest>({
+    deleteProduct: builder.mutation<MessageResponse, DeleteProductRequest>({
       query: ({ userId, productId }) => ({
         url: `${productId}?id=${userId}`,
         method: "DELETE",
@@ -80,9 +111,12 @@ export const productAPI = createApi({
 export const {
   useLatestProductsQuery,
   useAllProductsQuery,
+  useAllReviewsOfProductsQuery,
   useCategoriesQuery,
   useSearchProductsQuery,
-  useCreateProductMutation,
+  useNewReviewMutation,
+  useDeleteReviewMutation,
+  useNewProductMutation,
   useProductDetailsQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
